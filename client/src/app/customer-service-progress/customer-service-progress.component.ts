@@ -12,7 +12,7 @@ export class CustomerServiceProgressComponent {
   // serviceStatus: any = "Ready To Collect"
   serviceStatusList = ['Order Received', 'Waiting In Line', 'Service In Progress', 'Completed', 'Ready To Collect'];
   index = 0;
-  serviceStatus = this.serviceStatusList[0];
+  serviceStatus: any = this.serviceStatusList[0];
   intervalId: any;
 
   constructor() {
@@ -25,12 +25,18 @@ export class CustomerServiceProgressComponent {
   }
   
   ngOnInit() {
+    // start - manually loop the status
+    // this.intervalId = setInterval(() => {
+    //   this.serviceStatus = this.serviceStatusList[this.index];
+    //   this.index = this.index + 1;
+    //   if (this.index >= this.serviceStatusList.length) {
+    //     clearInterval(this.intervalId); // Stop the interval after last element
+    //   }
+    // }, 5000);
+    // end - manually loop the status
+
     this.intervalId = setInterval(() => {
-      this.serviceStatus = this.serviceStatusList[this.index];
-      this.index = this.index + 1;
-      if (this.index >= this.serviceStatusList.length) {
-        clearInterval(this.intervalId); // Stop the interval after last element
-      }
+      this.serviceStatus = localStorage.getItem("serviceStatus")
     }, 5000);
   }
 
