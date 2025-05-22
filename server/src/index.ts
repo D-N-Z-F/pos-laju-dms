@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 import dotenv from 'dotenv';
 import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
-import { saveMessage } from "./controllers/functions";
+import { getAllContacts, getMessageByContactId, saveMessage, saveTechnicianMessage } from "./controllers/functions";
 
 dotenv.config();
 const app = express();
@@ -34,9 +34,10 @@ app.get("/", (req: Request, res: Response) => {
 //-------------------------------------------------------------------
 
 app.post("/send-message", async (req: Request, res: Response) => {
-  const { number, message } = req.body;
-  const apiUrl = "https://dash.wasapbot.my/api/send";
-  const payload = {
+    const { number, message } = req.body;
+    console.log("RUNNING SEND MESSAGE", message);
+    const apiUrl = "https://dash.wasapbot.my/api/send";
+    const payload = {
     number: number,
     type: "text",
     message: message,
@@ -45,35 +46,61 @@ app.post("/send-message", async (req: Request, res: Response) => {
   };
 
   try {
-    const response = await axios.post(apiUrl, null, { params: payload });
-    const savedMessage = await saveMessage(number, message);
-    io.emit("New Message.", savedMessage);
-    res.json(response.data);
+    const response = await axios.get(apiUrl, { params: payload, headers: { 'ngrok-skip-browser-warning':  '69420' } });
+    console.log(response.data);
+    await saveTechnicianMessage(number, message);
+    io.emit('newMessage');
+    res.json({ message: 'Message sent.' });
   } catch (error: any) {
     console.error("Error sending message:", error.message);
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-app.get("/receive-message", async (req: Request, res: Response) => {
+app.post("/receive-message", async (req: Request, res: Response) => {
     try {
-    const { number, message } = req.body;
-    const savedMessage = await saveMessage(number, message);
-    io.emit("New Message.", savedMessage);
-    res.send('Message received.');
+        const { number, message } = req.body;
+        console.log("RUNNING RECEIVE MESSAGE", message);
+        let newNum = number.split('@')[0];
+        await saveMessage(newNum, message);
+        io.emit('newMessage');
+        res.json({ message: 'Message received.' });
+    } catch (error: any) {
+        console.error("Error saving message:", error.message);
+        res.status(500).send(error.message);
+    }
+});
+
+//-------------------------------------------------------------------
+
+app.get("/contacts", async (req: Request, res: Response) => {
+    try {
+        const contacts = await getAllContacts();
+        res.json(contacts);
+    } catch (error: any) {
+        console.error("Error getting contacts:", error.message);
+        res.status(500).send(error.message);
+    }
+});
+
+app.get("/messages/:contactId/:technicianId", async (req: Request, res: Response) => {
+  try {
+    const { contactId, technicianId } = req.params;
+    const messages = await getMessageByContactId(contactId, technicianId);
+    res.json(messages);
+  } catch (error: any) {
+    console.error("Error getting messages:", error.message);
+    res.status(500).send(error.message);
+  }
+});
+
+app.get("/haha", async (req: Request, res: Response) => {
+    try {
+        const savedMessage = await saveMessage('60123456789', 'TESTTESTTEST');
+        console.log(savedMessage);
+        res.send(savedMessage);
   } catch (error: any) {
     console.error("Error saving message:", error.message);
     res.status(500).send(error.message);
   }
 });
-
-// app.get("/haha", async (req: Request, res: Response) => {
-//     try {
-//     const savedMessage = await saveMessage('60123456789', 'TESTTESTTEST');
-//     console.log(savedMessage);
-//     res.send(savedMessage);
-//   } catch (error: any) {
-//     console.error("Error saving message:", error.message);
-//     res.status(500).send(error.message);
-//   }
-// });

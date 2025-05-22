@@ -1,0 +1,70 @@
+<div class="container-fluid vh-100 d-flex p-0">
+  <!-- Left sidebar: Contacts -->
+  <div class="border-end bg-light" style="width: 280px; overflow-y: auto;">
+    <h5 class="p-3 border-bottom">Contacts</h5>
+    <ul class="list-group list-group-flush">
+      <li 
+        *ngFor="let contact of contacts"
+        (click)="selectContact(contact._id)" 
+        [class.active]="contact.phone === selectedContact?.phone"
+        class="list-group-item list-group-item-action d-flex align-items-center"
+        style="cursor: pointer;"
+      >
+        <span class="flex-grow-1">{{ contact.phone }}</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Right main chat area -->
+  <div class="flex-grow-1 d-flex flex-column">
+    <div class="border-bottom p-3">
+      <h5>{{ selectedContact?.phone || 'Select A Contact' }}</h5>
+    </div>
+
+    <div 
+      class="flex-grow-1 overflow-auto px-3 py-2" 
+      style="background: #f8f9fa;"
+      #scrollContainer
+    >
+      <div *ngIf="!selectedContact" class="text-center text-muted mt-5">
+        Please select a contact to start chatting.
+      </div>
+
+      <div *ngFor="let message of messages" class="d-flex mb-2" 
+           [ngClass]="{
+             'justify-content-start': !message.contactId.isTechnician,
+             'justify-content-end': message.contactId.isTechnician
+           }"
+      >
+        <div 
+          class="p-2 rounded"
+          [ngClass]="{
+            'bg-primary text-white': message.contactId.isTechnician,
+            'bg-light border': !message.contactId.isTechnician
+          }"
+          style="max-width: 70%;"
+        >
+          <div>{{ message.message }}</div>
+          <small class="text-muted d-block text-end">{{ message.sentAt | date:'shortTime' }}</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input area -->
+    <div class="p-3 border-top">
+      <form (submit)="sendMessage()">
+        <div class="input-group">
+          <input 
+            type="text" 
+            class="form-control" 
+            placeholder="Type your message..." 
+            [(ngModel)]="newMessage" 
+            name="messageInput" 
+            required
+          />
+          <button class="btn btn-primary" type="submit" [disabled]="!newMessage.trim() || !selectedContact">Send</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,4 +1,3 @@
-import { Request, Response } from "express";
 import { Contact } from "../models/Contact";
 import { Message } from "../models/Message";
 
@@ -19,3 +18,21 @@ export const saveMessage = async (number: string, message: string) => {
 
   return saved;
 };
+
+export const saveTechnicianMessage = async (number: string, message: string) => {
+  let contact = await Contact.findOne({ isTechnician: true });
+
+  const newMessage = new Message({
+    contactId: contact!._id,
+    number,
+    message,
+  });
+
+  const saved = await newMessage.save();
+
+  return saved;
+};
+
+export const getAllContacts = async () => await Contact.find();
+
+export const getMessageByContactId = async (contactId: any, technicianId: any) => await Message.find({ contactId: { $in: [contactId, technicianId] } }).sort({ sentAt: 1 }).populate('contactId'); 
