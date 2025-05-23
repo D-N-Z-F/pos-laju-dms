@@ -33,15 +33,15 @@
 
       <div *ngFor="let message of messages" class="d-flex mb-2" 
            [ngClass]="{
-             'justify-content-start': !message.contactId.isTechnician,
-             'justify-content-end': message.contactId.isTechnician
+             'justify-content-start': !message.fromTechnician,
+             'justify-content-end': message.fromTechnician
            }"
       >
         <div 
           class="p-2 rounded"
           [ngClass]="{
-            'bg-primary text-white': message.contactId.isTechnician,
-            'bg-light border': !message.contactId.isTechnician
+            'bg-primary text-white': message.fromTechnician,
+            'bg-light border': !message.fromTechnician
           }"
           style="max-width: 70%;"
         >
