@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-customer-service-progress',
@@ -9,35 +10,27 @@ import { Component } from '@angular/core';
 })
 export class CustomerServiceProgressComponent {
 
-  // serviceStatus: any = "Ready To Collect"
+  serviceOrderId: any = '';
   serviceStatusList = ['Order Received', 'Waiting In Line', 'Service In Progress', 'Completed', 'Ready To Collect'];
   index = 0;
-  serviceStatus: any = this.serviceStatusList[0];
+  serviceStatus: any;
   intervalId: any;
 
-  constructor() {
-    console.log("serviceStatus", this.serviceStatus)
-    // let value = 1
-    // setInterval(() => {
-    //   value++;
-    //   console.log('Value is now:', value);
-    // }, 5000); // 5000 milliseconds = 5 seconds
+  constructor(private route: ActivatedRoute) {
+    this.serviceOrderId = this.route.snapshot.paramMap.get('id');
   }
   
   ngOnInit() {
-    // start - manually loop the status
-    // this.intervalId = setInterval(() => {
-    //   this.serviceStatus = this.serviceStatusList[this.index];
-    //   this.index = this.index + 1;
-    //   if (this.index >= this.serviceStatusList.length) {
-    //     clearInterval(this.intervalId); // Stop the interval after last element
-    //   }
-    // }, 5000);
-    // end - manually loop the status
+    this.setState();
 
-    this.intervalId = setInterval(() => {
-      this.serviceStatus = localStorage.getItem("serviceStatus")
-    }, 5000);
+    this.intervalId = setInterval(() => this.setState(), 5000);
+  }
+
+  setState = () => {
+    let serviceOrders = JSON.parse(localStorage.getItem('serviceOrders') ?? '') ?? [];
+    let serviceOrder = serviceOrders.find((serviceOrder: any) => serviceOrder.id == this.serviceOrderId);
+    this.serviceStatus = serviceOrder ? serviceOrder.status : 'Order Received';
+    console.log(serviceOrders, serviceOrder, this.serviceStatus);
   }
 
   colorValidationStatus() {
@@ -58,29 +51,29 @@ export class CustomerServiceProgressComponent {
       check: "bg-secondary"
     } 
     if (this.serviceStatus == "Waiting In Line") {
-      waitingInLine.bar = "bg-success"
-      waitingInLine.check = "bg-success"
+      waitingInLine.bar = "bg-info"
+      waitingInLine.check = "bg-info"
     } else if (this.serviceStatus == "Service In Progress") {
-      waitingInLine.bar = "bg-success"
-      waitingInLine.check = "bg-success"
-      serviceInProgress.bar = "bg-success"
-      serviceInProgress.check = "bg-success"
+      waitingInLine.bar = "bg-info"
+      waitingInLine.check = "bg-info"
+      serviceInProgress.bar = "bg-info"
+      serviceInProgress.check = "bg-info"
     } else if (this.serviceStatus == "Completed") {
-      waitingInLine.bar = "bg-success"
-      waitingInLine.check = "bg-success"
-      serviceInProgress.bar = "bg-success"
-      serviceInProgress.check = "bg-success"
-      completed.bar = "bg-success"
-      completed.check = "bg-success"
+      waitingInLine.bar = "bg-info"
+      waitingInLine.check = "bg-info"
+      serviceInProgress.bar = "bg-info"
+      serviceInProgress.check = "bg-info"
+      completed.bar = "bg-info"
+      completed.check = "bg-info"
     } else if (this.serviceStatus == "Ready To Collect") {
-      waitingInLine.bar = "bg-success"
-      waitingInLine.check = "bg-success"
-      serviceInProgress.bar = "bg-success"
-      serviceInProgress.check = "bg-success"
-      completed.bar = "bg-success"
-      completed.check = "bg-success"
-      readyToCollect.bar = "bg-success"
-      readyToCollect.check = "bg-success"
+      waitingInLine.bar = "bg-info"
+      waitingInLine.check = "bg-info"
+      serviceInProgress.bar = "bg-info"
+      serviceInProgress.check = "bg-info"
+      completed.bar = "bg-info"
+      completed.check = "bg-info"
+      readyToCollect.bar = "bg-info"
+      readyToCollect.check = "bg-info"
     }
     return { waitingInLine, serviceInProgress, completed, readyToCollect }
   }

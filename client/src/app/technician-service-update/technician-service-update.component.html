@@ -14,7 +14,7 @@
         </div>
 
         <!-- Right: Vehicle Info Card -->
-        <div class="vehicle-info-card">
+        <div class="vehicle-info-card" (click)="redirectToLiveUpdate()">
             <div class="info-row">
                 <span class="label">Car Plate:&nbsp;</span>
                 <span class="value">{{ selectedServiceOrder.carPlate || 'N/A' }}</span>

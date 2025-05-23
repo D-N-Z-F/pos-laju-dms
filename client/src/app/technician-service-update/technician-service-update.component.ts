@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import $ from 'jquery';
 import { ChatService } from '../services/chat.service';
 import { ToastrService } from 'ngx-toastr';
+import { Router } from '@angular/router';
 
 interface ServiceOrder {
   id: number | null,
@@ -32,9 +33,9 @@ export class TechnicianServiceUpdateComponent {
   };
   options: string[] = ['Pending Order', 'Order Received', 'Waiting In Line', 'Service In Progress', 'Completed', 'Ready To Collect'];
   selectedOption: string = '';
-  emailMessage: string = 'Hi! Your order has been received, please click the following link for live updates: <http://localhost:4200/customer-service-progress>';
+  emailMessage: string = 'Hi! Your order has been received, please click the following link for live updates: http://localhost:4200/customer-service-progress';
 
-  constructor(private chatService: ChatService, private toastr: ToastrService) {}
+  constructor(private chatService: ChatService, private toastr: ToastrService, private router: Router) {}
 
   ngOnInit(): void {
     const saved = localStorage.getItem('serviceOrders');
@@ -88,4 +89,12 @@ export class TechnicianServiceUpdateComponent {
     this.selectedServiceOrder = this.serviceOrders.find((serviceOrder) => serviceOrder.id === serviceOrderId)!;
     this.selectedOption = this.selectedServiceOrder.status;
   }
+
+  redirectToLiveUpdate = () => {
+    if (
+      this.selectedServiceOrder.id && this.selectedServiceOrder.status != 'Pending Order'
+    ) {
+      this.router.navigate(['/customer-service-progress', this.selectedServiceOrder.id]);
+    }
+  };
 }

@@ -9,7 +9,7 @@ export const routes: Routes = [
         component: TechnicianChatComponent,
     },
     {
-        path: 'customer-service-progress',
+        path: 'customer-service-progress/:id',
         component: CustomerServiceProgressComponent,
     },
     {
