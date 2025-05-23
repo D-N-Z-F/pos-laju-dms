@@ -30,5 +30,4 @@ export class ChatService {
     ): Observable<any> => this.http.post<any>(
         `${this.apiUrl}/send-message`, { number: number, message: message },  this.options
     );
-
 }

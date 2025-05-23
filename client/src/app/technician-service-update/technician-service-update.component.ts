@@ -2,6 +2,16 @@ import { CommonModule } from '@angular/common';
 import { Component, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import $ from 'jquery';
+import { ChatService } from '../services/chat.service';
+import { ToastrService } from 'ngx-toastr';
+
+interface ServiceOrder {
+  id: number | null,
+  carPlate: string,
+  chassisNumber: string,
+  contactNo: string,
+  status: string
+}
 
 @Component({
   selector: 'app-technician-service-update',
@@ -10,38 +20,72 @@ import $ from 'jquery';
   styleUrl: './technician-service-update.component.scss',
   encapsulation: ViewEncapsulation.None
 })
+
 export class TechnicianServiceUpdateComponent {
-  messages = [
-    { text: 'Hello!', type: 'received' },
-    { text: 'Hi, how are you?', type: 'sent' }
-  ];
-  newMessage = '';
-  options: string[] = ['Order Received', 'Waiting In Line', 'Service In Progress', 'Completed', 'Ready To Collect'];
-  selectedOption: string = 'Order Received';
-  carPlate = 'SYG1234';
-  chassisNumber = '23458039';
+  serviceOrders: ServiceOrder[] = [];
+  selectedServiceOrder: ServiceOrder = {
+    id: null,
+    carPlate: '',
+    chassisNumber: '',
+    contactNo: '',
+    status: ''
+  };
+  options: string[] = ['Pending Order', 'Order Received', 'Waiting In Line', 'Service In Progress', 'Completed', 'Ready To Collect'];
+  selectedOption: string = '';
+  emailMessage: string = 'Hi! Your order has been received, please click the following link for live updates: <http://localhost:4200/customer-service-progress>';
 
-  constructor() {
-    if (localStorage.getItem("serviceStatus")) {
-      localStorage.removeItem("serviceStatus")
+  constructor(private chatService: ChatService, private toastr: ToastrService) {}
+
+  ngOnInit(): void {
+    const saved = localStorage.getItem('serviceOrders');
+    if(!saved) {
+      this.serviceOrders = [
+        {
+          id: 1,
+          carPlate: 'SYG1234',
+          chassisNumber: '23458039',
+          contactNo: '601131884569',
+          status: 'Pending Order'
+        },
+        {
+          id: 2,
+          carPlate: 'WTF7870',
+          chassisNumber: '12345678',
+          contactNo: '601131884569',
+          status: 'Pending Order'
+        },
+        {
+          id: 3,
+          carPlate: 'SYG1234',
+          chassisNumber: '98765432',
+          contactNo: '601131884569',
+          status: 'Pending Order'
+        }
+      ]
+      localStorage.setItem('serviceOrders', JSON.stringify(this.serviceOrders));
+    } else {
+      this.serviceOrders = JSON.parse(saved);
     }
   }
 
-  onActionClick() {
-    // alert('Selected option: ' + this.selectedOption);
-    if (localStorage.getItem("serviceStatus")) {
-      localStorage.removeItem("serviceStatus")
+  updateServiceOrder = (serviceOrderId: number) => {
+    this.serviceOrders = this.serviceOrders.map(
+      (serviceOrder) =>
+        serviceOrder.id === serviceOrderId
+          ? { ...serviceOrder, status: this.selectedOption }
+          : serviceOrder
+      );
+    localStorage.setItem('serviceOrders', JSON.stringify(this.serviceOrders));
+    if(this.selectedOption === 'Order Received') {
+      const number = this.selectedServiceOrder.contactNo;
+      this.chatService.sendMessage(number, this.emailMessage).subscribe(
+        (_) => this.toastr.success('Email successfully sent!', "Success!")
+      );
     }
-    localStorage.setItem("serviceStatus", this.selectedOption)
   }
 
-  sendMsg() {
-    const msg = ($('#chat-message') as any).val().trim();
-      if (msg) {
-        $('.chat-box').append(`<div>${msg}</div>`);
-        $('.chat-box div').last().addClass("chat-bubble user");
-        $('#chat-message').val('');
-        $('.chat-box').scrollTop($('.chat-box')[0].scrollHeight);
-      }
+  selectServiceOrder = (serviceOrderId: number) => {
+    this.selectedServiceOrder = this.serviceOrders.find((serviceOrder) => serviceOrder.id === serviceOrderId)!;
+    this.selectedOption = this.selectedServiceOrder.status;
   }
 }

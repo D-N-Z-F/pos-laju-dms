@@ -21,6 +21,12 @@ export const saveMessage = async (number: string, message: string) => {
 
 export const saveTechnicianMessage = async (number: string, message: string) => {
   let contact = await Contact.findOne({ isTechnician: true });
+  let newContact = await Contact.findOne({ phone: number, isTechnician: false });
+
+  if(!newContact) {
+    newContact = new Contact({ phone: number });
+    await newContact.save();
+  }
 
   const newMessage = new Message({
     contactId: contact!._id,
