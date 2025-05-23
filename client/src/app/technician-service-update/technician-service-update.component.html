@@ -42,8 +42,10 @@
             </div>
             <div class="card-body chat-box d-flex flex-column">
                 <!-- Messages -->
-                <div class="chat-bubble bot">Hi! I need help.</div>
-                <div class="chat-bubble user">Hello, how can I help you?</div>
+                <div class="chat-bubble" [ngClass]="msg.from != 'You' ? 'bot' : 'user'"
+                    *ngFor="let msg of messages">
+                <p><strong>{{ (msg.from != "You" ? msg.from.split(":")[1] : msg.from) || msg.to }}:</strong> {{ msg.messageBody || msg.body }}</p>
+                </div>
             </div>
             <div class="chat-input d-flex">
                 <input type="text" class="form-control me-2" id="chat-message" placeholder="Type your message...">
