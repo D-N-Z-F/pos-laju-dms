@@ -6,7 +6,7 @@ import { Observable } from "rxjs";
   providedIn: 'root',
 })
 export class ChatService {
-    private apiUrl = 'https://26f3-175-141-68-26.ngrok-free.app';
+    private apiUrl = 'https://db14-175-141-68-26.ngrok-free.app';
     private options = {
         headers: {
             'Content-Type': 'application/json',

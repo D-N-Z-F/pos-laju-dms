@@ -10,7 +10,7 @@ export class SocketService {
   private socket: Socket;
 
   constructor() {
-    this.socket = io('https://26f3-175-141-68-26.ngrok-free.app', {
+    this.socket = io('https://db14-175-141-68-26.ngrok-free.app', {
         extraHeaders: {
             'ngrok-skip-browser-warning':  '69420'
         }

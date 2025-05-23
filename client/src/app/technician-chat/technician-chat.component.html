@@ -19,7 +19,7 @@
   <div class="flex-grow-1 d-flex flex-column">
     <div class="border-bottom d-flex justify-content-between p-3">
       <h5>{{ selectedContact?.phone || 'Select A Contact' }}</h5>
-      <button class="btn btn-primary">Update Status</button>
+      <button (click)="redirectToTechnicianServiceUpdate()" class="btn btn-primary">Update Status</button>
     </div>
 
     <div 

@@ -34,20 +34,23 @@ app.get("/", (req: Request, res: Response) => {
 //-------------------------------------------------------------------
 
 app.post("/send-message", async (req: Request, res: Response) => {
+  try {
     const { number, message } = req.body;
     console.log("RUNNING SEND MESSAGE", message);
-    const apiUrl = "https://dash.wasapbot.my/api/send";
-    const payload = {
-    number: number,
-    type: "text",
-    message: message,
-    instance_id: "668768DB96ECF",
-    access_token: "668755e172ebf",
-  };
-
-  try {
-    const response = await axios.get(apiUrl, { params: payload, headers: { 'ngrok-skip-browser-warning':  '69420' } });
-    console.log(response.data);
+    const params = new URLSearchParams({
+        number,
+        type: 'text',
+        message,
+        instance_id: "668768DB96ECF",
+        access_token: "668755e172ebf",
+    });
+    const apiUrl = `https://dash.wasapbot.my/api/send?${params.toString()}`;
+    console.log(apiUrl, params);
+    const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: { 'ngrok-skip-browser-warning':  '69420' }
+    });
+    console.log(await response.json());
     await saveTechnicianMessage(number, message);
     io.emit('newMessage');
     res.json({ message: 'Message sent.' });

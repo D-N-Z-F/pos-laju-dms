@@ -4,6 +4,7 @@ import { SocketService } from '../services/socket.service';
 import { ChatService } from '../services/chat.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-technician-chat',
@@ -19,7 +20,7 @@ export class TechnicianChatComponent {
   newMessage: string = '';
   private socketSub!: Subscription;
 
-  constructor(private socketService: SocketService, private chatService: ChatService) {}
+  constructor(private router: Router, private socketService: SocketService, private chatService: ChatService) {}
 
   ngOnInit() {
     this.loadContacts();
@@ -44,7 +45,7 @@ export class TechnicianChatComponent {
       this.chatService
         .getMessageByContactId(this.selectedContact._id, this.technician._id)
         .subscribe((data) => {
-          this.messages = data;
+          this.messages = data.filter((each: any) => each.message.length);
           console.log("LOAD MESSAGES", this.messages);
         });
     } else {
@@ -54,10 +55,12 @@ export class TechnicianChatComponent {
 
   sendMessage = () => {
     if (!this.newMessage.trim()) return;
-    this.chatService.sendMessage(this.selectedContact._id ,this.newMessage).subscribe(() => {
+    this.chatService.sendMessage(this.selectedContact.phone ,this.newMessage).subscribe(() => {
       this.newMessage = '';
     });
   }
+
+  redirectToTechnicianServiceUpdate = () => this.router.navigate(['/technician-service-update']);
 
   ngOnDestroy() {
     this.socketSub.unsubscribe();
